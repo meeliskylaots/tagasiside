@@ -1,0 +1,271 @@
+import React, { useState } from 'react';
+import { ChevronRight, ChevronLeft, Check, Star, MessageSquare, Info, Send } from 'lucide-react';
+
+const App = () => {
+  const [step, setStep] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    rating10: 0,
+    positive: '',
+    improvements: '',
+    rating5: 0,
+    suggestions: '',
+    channels: [],
+    extra: ''
+  });
+
+  const channelsList = [
+    "Facebook (grupid, sündmused)",
+    "Instagram",
+    "Koduleht",
+    "E-post / uudiskiri",
+    "Kohalik meedia (ajaleht, portaal)",
+    "Sõbrad / tuttavad",
+    "Plakatid / kuulutused tänaval"
+  ];
+
+  const nextStep = () => setStep(prev => prev + 1);
+  const prevStep = () => setStep(prev => prev - 1);
+
+  const toggleChannel = (channel) => {
+    setFormData(prev => ({
+      ...prev,
+      channels: prev.channels.includes(channel)
+        ? prev.channels.filter(c => c !== channel)
+        : [...prev.channels, channel]
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSubmitted(true);
+  };
+
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans">
+        <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 text-center animate-in fade-in zoom-in duration-500">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="text-green-600 w-10 h-10" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-800 mb-4">Suur tänu vastamast!</h2>
+          <p className="text-slate-600 mb-8">Sinu tagasiside on meile väga oluline ja aitab meil järgmisi üritusi veelgi paremaks muuta.</p>
+          <button 
+            onClick={() => { setStep(0); setSubmitted(false); setFormData({rating10:0, positive:'', improvements:'', rating5:0, suggestions:'', channels:[], extra:''}); }}
+            className="text-blue-600 font-semibold hover:underline"
+          >
+            Täida uuesti
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const steps = [
+    // Sissejuhatus
+    (
+      <div className="space-y-6">
+        <div className="bg-blue-50 p-6 rounded-2xl mb-8">
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Ürituse tagasiside</h1>
+          <p className="text-slate-600 leading-relaxed">
+            Aitäh, et osalesid! Sinu tagasiside aitab meil järgmisi üritusi paremaks teha. 
+            Palun leia hetk, et vastata neile küsimustele.
+          </p>
+        </div>
+        <button onClick={nextStep} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 group">
+          Alusta küsitlust
+          <ChevronRight className="group-hover:translate-x-1 transition-transform" />
+        </button>
+      </div>
+    ),
+    // Küsimus 1: 1-10 skaala
+    (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">1</div>
+          <h2 className="text-lg font-semibold text-slate-800">Kuidas hindad üritust tervikuna?</h2>
+        </div>
+        <p className="text-sm text-slate-400 mb-4">1 = väga halb, 10 = suurepärane</p>
+        <div className="grid grid-cols-5 gap-2 sm:grid-cols-10">
+          {[...Array(10)].map((_, i) => (
+            <button
+              key={i+1}
+              onClick={() => { setFormData({...formData, rating10: i+1}); nextStep(); }}
+              className={`h-12 rounded-xl border-2 transition-all font-bold ${formData.rating10 === i+1 ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-100 text-slate-600 hover:border-blue-200'}`}
+            >
+              {i+1}
+            </button>
+          ))}
+        </div>
+      </div>
+    ),
+    // Küsimus 2 & 3: Positiivne ja parendused
+    (
+      <div className="space-y-8">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">2</div>
+            <h2 className="text-lg font-semibold text-slate-800">Mis jäi sulle üritusest kõige positiivsemalt meelde?</h2>
+          </div>
+          <textarea 
+            rows="3"
+            className="w-full p-4 rounded-2xl border-2 border-slate-100 focus:border-blue-500 outline-none transition-all"
+            placeholder="Kirjuta siia..."
+            value={formData.positive}
+            onChange={(e) => setFormData({...formData, positive: e.target.value})}
+          />
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">3</div>
+            <h2 className="text-lg font-semibold text-slate-800">Mis võiks järgmisel korral olla paremini?</h2>
+          </div>
+          <textarea 
+            rows="3"
+            className="w-full p-4 rounded-2xl border-2 border-slate-100 focus:border-blue-500 outline-none transition-all"
+            placeholder="Kirjuta siia..."
+            value={formData.improvements}
+            onChange={(e) => setFormData({...formData, improvements: e.target.value})}
+          />
+        </div>
+        <button onClick={nextStep} className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl transition-all">Jätka</button>
+      </div>
+    ),
+    // Küsimus 4: 1-5 skaala
+    (
+      <div className="space-y-6 text-center">
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">4</div>
+          <h2 className="text-lg font-semibold text-slate-800 text-left">Kuidas jäid rahule ürituse korraldusega?</h2>
+        </div>
+        <p className="text-sm text-slate-400 mb-8">(Atmosfäär, info, ajakava, teenused)</p>
+        <div className="flex justify-center gap-4">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              onClick={() => { setFormData({...formData, rating5: star}); nextStep(); }}
+              className="group flex flex-col items-center gap-2"
+            >
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${formData.rating5 >= star ? 'bg-amber-400 text-white' : 'bg-slate-50 text-slate-300 group-hover:bg-amber-100'}`}>
+                <Star fill={formData.rating5 >= star ? "currentColor" : "none"} size={28} />
+              </div>
+              <span className="text-xs text-slate-400 font-medium">{star === 1 ? 'Halb' : star === 5 ? 'Väga hea' : ''}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    ),
+    // Küsimus 5: Tulevikuvaade
+    (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">5</div>
+          <h2 className="text-lg font-semibold text-slate-800">Millistest teemadest või esinejatest sooviksid edaspidi kuulda?</h2>
+        </div>
+        <textarea 
+          rows="4"
+          className="w-full p-4 rounded-2xl border-2 border-slate-100 focus:border-blue-500 outline-none transition-all"
+          placeholder="Sinu soovid..."
+          value={formData.suggestions}
+          onChange={(e) => setFormData({...formData, suggestions: e.target.value})}
+        />
+        <button onClick={nextStep} className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl transition-all">Jätka</button>
+      </div>
+    ),
+    // Küsimus 6: Kanalid
+    (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">6</div>
+          <h2 className="text-lg font-semibold text-slate-800">Kust sa tavaliselt sündmuste kohta infot saad?</h2>
+        </div>
+        <div className="space-y-2">
+          {channelsList.map((channel) => (
+            <div 
+              key={channel}
+              onClick={() => toggleChannel(channel)}
+              className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between ${formData.channels.includes(channel) ? 'border-blue-500 bg-blue-50' : 'border-slate-50 hover:border-slate-200'}`}
+            >
+              <span className={`text-sm font-medium ${formData.channels.includes(channel) ? 'text-blue-700' : 'text-slate-600'}`}>{channel}</span>
+              <div className={`w-5 h-5 rounded flex items-center justify-center transition-all ${formData.channels.includes(channel) ? 'bg-blue-600' : 'bg-slate-100'}`}>
+                {formData.channels.includes(channel) && <Check size={14} className="text-white" />}
+              </div>
+            </div>
+          ))}
+        </div>
+        <button onClick={nextStep} className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl transition-all">Viimane samm</button>
+      </div>
+    ),
+    // Küsimus 7: Lisa
+    (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">7</div>
+          <h2 className="text-lg font-semibold text-slate-800">Kas soovid veel midagi meiega jagada?</h2>
+        </div>
+        <textarea 
+          rows="4"
+          className="w-full p-4 rounded-2xl border-2 border-slate-100 focus:border-blue-500 outline-none transition-all"
+          placeholder="Märkused, tervitused..."
+          value={formData.extra}
+          onChange={(e) => setFormData({...formData, extra: e.target.value})}
+        />
+        <button 
+          onClick={handleSubmit} 
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2"
+        >
+          <Send size={20} />
+          Saada vastused
+        </button>
+      </div>
+    )
+  ];
+
+  const progress = (step / (steps.length - 1)) * 100;
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col p-4 font-sans text-slate-900">
+      <div className="max-w-2xl w-full mx-auto mt-8 sm:mt-16">
+        
+        {/* Progress Bar */}
+        {step > 0 && (
+          <div className="mb-8 space-y-2">
+            <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <span>Samm {step} / {steps.length - 1}</span>
+              <span>{Math.round(progress)}% täidetud</span>
+            </div>
+            <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-blue-600 transition-all duration-500 ease-out" 
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Card Container */}
+        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 sm:p-10 min-h-[400px] flex flex-col justify-center relative overflow-hidden">
+          {step > 0 && (
+            <button 
+              onClick={prevStep}
+              className="absolute top-6 left-6 p-2 text-slate-300 hover:text-slate-600 transition-colors"
+            >
+              <ChevronLeft size={24} />
+            </button>
+          )}
+          
+          <div className="animate-in slide-in-from-right-4 fade-in duration-300">
+            {steps[step]}
+          </div>
+        </div>
+
+        {/* Footer info */}
+        <p className="mt-8 text-center text-slate-400 text-xs">
+          Vastamine võtab aega umbes 1-2 minutit.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default App;
